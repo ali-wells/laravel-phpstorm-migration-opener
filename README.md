@@ -1,4 +1,4 @@
-# Laravel 5 Phpstorm Migration Opener
+# Laravel 5 PhpStorm Migration Opener
 
 Auto open migrations in editor window after creation in the PhpStorm internal terminal.
 

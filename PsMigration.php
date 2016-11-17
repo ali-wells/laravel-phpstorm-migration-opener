@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use DirectoryIterator;
 
 class PsMigration extends MigrateMakeCommand
 {
@@ -27,7 +28,7 @@ class PsMigration extends MigrateMakeCommand
     protected $description = 'Create a new migration file and auto-open in PhpStorm';
 
     /**
-     * Write the migration file to disk.
+     * Write the migration file to disk and open in the current PhpStorm session
      *
      * @param  string  $name
      * @param  string  $table
@@ -36,14 +37,34 @@ class PsMigration extends MigrateMakeCommand
      */
     protected function writeMigration($name, $table, $create)
     {
-        $path = $this->getMigrationPath();
-        $full_file = $this->creator->create($name, $path, $table, $create);
+        parent::writeMigration($name, $table, $create);
 
-        $file = pathinfo($full_file, PATHINFO_FILENAME);
+        $migration_path = $this->getMigrationPath();
+        $latest_migration = $this->getLastMigration($migration_path);
 
-        $this->line("<info>Created Migration:</info> $file");
+        if($latest_migration !== ''){
+            exec("$this->bin ".escapeshellarg($migration_path.DIRECTORY_SEPARATOR.$latest_migration));
+        }
+    }
 
-        exec("$this->bin $full_file");
+    function getLastMigration($migration_path)
+    {
+        $time_placeholder = 0;
+        $latest_migration = '';
+
+        foreach (new DirectoryIterator($migration_path) as $file) {
+            //Exclude the parent directory
+            if ($file->getFilename() !== '.') {
+                $created_time = $file->getCTime();    // Time file was created
+                $filename = $file->getFilename(); // File name
+                if ($created_time > $time_placeholder) {
+                    $time_placeholder = $created_time;
+                    $latest_migration = $filename;
+                }
+            }
+        }
+
+        return $latest_migration;
     }
 
 }

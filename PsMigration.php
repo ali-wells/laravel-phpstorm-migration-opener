@@ -33,30 +33,36 @@ class PsMigration extends MigrateMakeCommand
      * @param  string  $name
      * @param  string  $table
      * @param  bool    $create
-     * @return string
      */
     protected function writeMigration($name, $table, $create)
     {
         parent::writeMigration($name, $table, $create);
 
-        $migration_path = $this->getMigrationPath();
-        $latest_migration = $this->getLastMigration($migration_path);
+        $migrationPath = $this->getMigrationPath();
+        $latestMigration = $this->getLastMigration($migrationPath);
 
-        if($latest_migration !== ''){
-            exec("$this->bin ".escapeshellarg($migration_path.DIRECTORY_SEPARATOR.$latest_migration));
+        if($latestMigration !== ''){
+            exec("$this->bin ".escapeshellarg($migrationPath.DIRECTORY_SEPARATOR.$latestMigration));
         }
     }
 
-    function getLastMigration($migration_path)
+    /**
+     * Returns the latest file created in the $migration_path directory
+     *
+     * @param string $migration_path
+     * @return string
+     */
+    protected function getLastMigration($migration_path)
     {
         $time_placeholder = 0;
         $latest_migration = '';
 
         foreach (new DirectoryIterator($migration_path) as $file) {
-            //Exclude the parent directory
-            if ($file->getFilename() !== '.') {
-                $created_time = $file->getCTime();    // Time file was created
-                $filename = $file->getFilename(); // File name
+            $created_time = $file->getCTime();
+            $filename = $file->getFilename();
+
+            //Exclude the parent directory from the comparison
+            if ($filename !== '.') {
                 if ($created_time > $time_placeholder) {
                     $time_placeholder = $created_time;
                     $latest_migration = $filename;
@@ -66,5 +72,4 @@ class PsMigration extends MigrateMakeCommand
 
         return $latest_migration;
     }
-
 }

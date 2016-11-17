@@ -8,6 +8,11 @@ use DirectoryIterator;
 
 class PsMigration extends MigrateMakeCommand
 {
+    /**
+     * The name of the PhpStorm command line launcher
+     *
+     * @var string
+     */
     protected $bin = 'pstorm';
 
     /**
@@ -30,9 +35,9 @@ class PsMigration extends MigrateMakeCommand
     /**
      * Write the migration file to disk and open in the current PhpStorm session
      *
-     * @param  string  $name
-     * @param  string  $table
-     * @param  bool    $create
+     * @param  string $name
+     * @param  string $table
+     * @param  bool $create
      */
     protected function writeMigration($name, $table, $create)
     {
@@ -41,7 +46,7 @@ class PsMigration extends MigrateMakeCommand
         $migrationPath = $this->getMigrationPath();
         $latestMigration = $this->getLastMigration($migrationPath);
 
-        if($latestMigration !== ''){
+        if ($latestMigration !== '') {
             exec("$this->bin " . escapeshellarg($migrationPath . DIRECTORY_SEPARATOR . $latestMigration));
         }
     }

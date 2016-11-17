@@ -42,7 +42,7 @@ class PsMigration extends MigrateMakeCommand
         $latestMigration = $this->getLastMigration($migrationPath);
 
         if($latestMigration !== ''){
-            exec("$this->bin ".escapeshellarg($migrationPath.DIRECTORY_SEPARATOR.$latestMigration));
+            exec("$this->bin " . escapeshellarg($migrationPath . DIRECTORY_SEPARATOR . $latestMigration));
         }
     }
 
